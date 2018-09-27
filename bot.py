@@ -33,18 +33,6 @@ def find_mentions(reddit):
     return False
 
 
-def find_requests(reddit):
-    subreddit = reddit.subreddit(SUBREDDIT)
-    for submission in subreddit.new(limit=10):
-        print(submission.title)
-        submission.comments.replace_more(limit=0)
-        for comment in submission.comments:
-            if re.search(BOT_USERNAME, comment.body, re.IGNORECASE) and not already_replied(comment):
-                handle_request(comment)
-                return True
-    return False
-
-
 def handle_request(comment):
     index = comment.body.index(BOT_USERNAME) + len(BOT_USERNAME)
     query = comment.body[index:]
@@ -56,11 +44,11 @@ def handle_request(comment):
 
 
 def build_response(query, headlines):
-    response = "Here are some relevant recent headlines for: " + query + "  "
+    response = "Here are some relevant recent headlines for: " + query + "\n\n"
     headline_count = 0
     for headline in headlines:
         headline_count += 1
-        response += "[" + headline["name"] + "](" + headline["url"] + ")\n  "
+        response += "[" + headline["name"] + "](" + headline["url"] + ")\n\n"
         if headline_count >= 5:
             return response
     return response
