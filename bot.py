@@ -4,7 +4,7 @@ import json
 import os
 import requests
 
-BOT_USERNAME = "/u/soccer"
+BOT_USERNAME = "/u/headline_checker_bot"
 SUBREDDIT = "news"
 
 def lambda_handler(event, context):
@@ -15,12 +15,22 @@ def lambda_handler(event, context):
                          username = os.environ['USERNAME'],
                          password = os.environ['PASSWORD'])
 
-    handled_request = find_requests(reddit)
+    handled_request = find_mentions(reddit)
 
     return {
         "statusCode": 200,
         "handled_request": handled_request,
     }
+
+
+def find_mentions(reddit):
+    for mention_comment in reddit.inbox.mentions(limit=5):
+        if not already_replied(mention_comment):
+            print("Found new request to reply to")
+            print(mention_comment)
+            handle_request(mention_comment)
+            return True
+    return False
 
 
 def find_requests(reddit):
