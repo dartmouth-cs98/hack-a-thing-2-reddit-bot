@@ -25,10 +25,10 @@ def lambda_handler(event, context):
 
 
 def find_mentions(reddit):
-    for mention_comment in reddit.inbox.mentions(limit=5):
-        if not already_replied(mention_comment):
-            print("Found new mention, from user " + mention_comment.author)
-            handle_request(mention_comment)
+    for comment in reddit.inbox.mentions(limit=5):
+        if not already_replied(comment):
+            print("Found new mention, from user " + comment.author.name)
+            handle_request(comment)
             return True
     print("No new mentions found")
     return False
@@ -55,9 +55,11 @@ def build_response(query, headlines):
 
 
 def already_replied(comment):
+    comment.refresh()
     top_level_replies = comment.replies
     top_level_replies.replace_more(limit=None)
     for reply in top_level_replies:
+        print(reply.author.name.lower())
         if reply.author.name.lower() == "headline_checker_bot":
             print("already replied to comment", comment.body)
             return True
